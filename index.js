@@ -53,6 +53,7 @@ var vectorSource = new VectorSource({
                  'http://www.w3.org/1999/xlink' : 'xlink',
                  'http://www.opengis.net/sld' : 'sld' }
              });
+
  var marshaller = context.createMarshaller();
 
  var sld_json = {
@@ -81,6 +82,16 @@ var vectorSource = new VectorSource({
                    {
                      "TYPE_NAME": "SLD_1_0_0.Rule",
                      "symbolizer": [
+                       {
+                         "name": {
+                           "namespaceURI": "http://www.opengis.net/sld",
+                           "localPart": "IsDefault",
+                           "prefix": "",
+                           "key": "{http://www.opengis.net/sld}IsDefault",
+                           "string": "{http://www.opengis.net/sld}IsDefault"
+                         },
+                         "value": true
+                       },
                        {
                          "name": {
                            "namespaceURI": "http://www.opengis.net/sld",
@@ -130,13 +141,89 @@ var vectorSource = new VectorSource({
              ]
            }
          ]
-       }
+       },
+
+         {
+           "TYPE_NAME": "SLD_1_0_0.NamedLayer",
+           "name": "Canlin:site_10_11_26_13_02w4_31",
+           "namedStyleOrUserStyle": [
+             {
+               "TYPE_NAME": "SLD_1_0_0.UserStyle",
+               "title": "FocusedGeo Rainbow Scale",
+               "featureTypeStyle": [
+                 {
+                   "TYPE_NAME": "SLD_1_0_0.FeatureTypeStyle",
+                   "rule": [
+                     {
+                       "TYPE_NAME": "SLD_1_0_0.Rule",
+                       "symbolizer": [
+                         {
+                           "name": {
+                             "namespaceURI": "http://www.opengis.net/sld",
+                             "localPart": "IsDefault",
+                             "prefix": "",
+                             "key": "{http://www.opengis.net/sld}IsDefault",
+                             "string": "{http://www.opengis.net/sld}IsDefault"
+                           },
+                           "value": true
+                         },
+                         {
+                           "name": {
+                             "namespaceURI": "http://www.opengis.net/sld",
+                             "localPart": "RasterSymbolizer",
+                             "prefix": "",
+                             "key": "{http://www.opengis.net/sld}RasterSymbolizer",
+                             "string": "{http://www.opengis.net/sld}RasterSymbolizer"
+                           },
+                           "value": {
+                             "TYPE_NAME": "SLD_1_0_0.RasterSymbolizer",
+                             "colorMap": {
+                               "TYPE_NAME": "SLD_1_0_0.ColorMap",
+                               "colorMapEntry": [
+                                 {
+                                   "TYPE_NAME": "SLD_1_0_0.ColorMapEntry",
+                                   "color": "#0000ff",
+                                   "quantity": 0
+                                 },
+                                 {
+                                   "TYPE_NAME": "SLD_1_0_0.ColorMapEntry",
+                                   "color": "#00ffff",
+                                   "quantity": 20
+                                 },
+                                 {
+                                   "TYPE_NAME": "SLD_1_0_0.ColorMapEntry",
+                                   "color": "#00ff00",
+                                   "quantity": 40
+                                 },
+                                 {
+                                   "TYPE_NAME": "SLD_1_0_0.ColorMapEntry",
+                                   "color": "#ffff00",
+                                   "quantity": 60
+                                 },
+                                 {
+                                   "TYPE_NAME": "SLD_1_0_0.ColorMapEntry",
+                                   "color": "#ff0000",
+                                   "quantity": 80
+                                 }
+                               ]
+                             }
+                           }
+                         }
+                       ]
+                     }
+                   ]
+                 }
+               ]
+             }
+           ]
+         }
      ]
    }
  };
 
 
-var sld_xml = marshaller.marshalString(sld_json)
+var sld_xml = marshaller.marshalString(sld_json);
+console.log(sld_xml);
 
 var map = new Map({
     target: 'map',
@@ -184,7 +271,7 @@ var map = new Map({
 					       url: 'https://larsenwest.ca:8443/geoserver/Canlin/wms',
 					       attributions: '© <a href="https://aksgeoscience.com" >AKS Geoscience</a>',
 								 params: {
-								           'LAYERS':'site_21_14_19_016_01w4_31',
+								           'LAYERS':'Canlin:site_10_11_26_13_02w4_31, Canlin:site_21_14_19_016_01w4_31',
 													 'TILED': true,
                            //'STYLES': 'test_rs',
                            'SLD_BODY': sld_xml
