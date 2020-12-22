@@ -5,7 +5,7 @@
     "ol-ext": "^3.1.17"
   },
   "devDependencies": {
-    "parcel": "1.11.0"
+    "parcel": "^1.12.4"
   },
   "scripts": {
     "start": "parcel index.html",

@@ -2,3 +2,5 @@ node_modules*
 package-lock.json
 .cache*
 dist*
+.tags
+.tags1
