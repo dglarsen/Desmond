@@ -42,6 +42,102 @@ var vectorSource = new VectorSource({
    width: 1.25
  });
 
+ var Jsonix = require('jsonix').Jsonix;
+ var XLink_1_0 = require('w3c-schemas').XLink_1_0;
+ var GML_2_1_2 = require('ogc-schemas').GML_2_1_2;
+ var Filter_1_0_0 = require('ogc-schemas').Filter_1_0_0;
+ var SLD_1_0_0 = require('ogc-schemas').SLD_1_0_0;
+
+ var context =  new Jsonix.Context([SLD_1_0_0,GML_2_1_2,XLink_1_0,Filter_1_0_0],  {
+             namespacePrefixes : {
+                 'http://www.w3.org/1999/xlink' : 'xlink',
+                 'http://www.opengis.net/sld' : 'sld' }
+             });
+ var marshaller = context.createMarshaller();
+
+ var sld_json = {
+   "name": {
+     "namespaceURI": "http://www.opengis.net/sld",
+     "localPart": "StyledLayerDescriptor",
+     "prefix": "",
+     "key": "{http://www.opengis.net/sld}StyledLayerDescriptor",
+     "string": "{http://www.opengis.net/sld}StyledLayerDescriptor"
+   },
+   "value": {
+     "TYPE_NAME": "SLD_1_0_0.StyledLayerDescriptor",
+     "version": "1.0.0",
+     "namedLayerOrUserLayer": [
+       {
+         "TYPE_NAME": "SLD_1_0_0.NamedLayer",
+         "name": "Canlin:site_21_14_19_016_01w4_31",
+         "namedStyleOrUserStyle": [
+           {
+             "TYPE_NAME": "SLD_1_0_0.UserStyle",
+             "title": "FocusedGeo Rainbow Scale",
+             "featureTypeStyle": [
+               {
+                 "TYPE_NAME": "SLD_1_0_0.FeatureTypeStyle",
+                 "rule": [
+                   {
+                     "TYPE_NAME": "SLD_1_0_0.Rule",
+                     "symbolizer": [
+                       {
+                         "name": {
+                           "namespaceURI": "http://www.opengis.net/sld",
+                           "localPart": "RasterSymbolizer",
+                           "prefix": "",
+                           "key": "{http://www.opengis.net/sld}RasterSymbolizer",
+                           "string": "{http://www.opengis.net/sld}RasterSymbolizer"
+                         },
+                         "value": {
+                           "TYPE_NAME": "SLD_1_0_0.RasterSymbolizer",
+                           "colorMap": {
+                             "TYPE_NAME": "SLD_1_0_0.ColorMap",
+                             "colorMapEntry": [
+                               {
+                                 "TYPE_NAME": "SLD_1_0_0.ColorMapEntry",
+                                 "color": "#0000ff",
+                                 "quantity": 0
+                               },
+                               {
+                                 "TYPE_NAME": "SLD_1_0_0.ColorMapEntry",
+                                 "color": "#00ffff",
+                                 "quantity": 20
+                               },
+                               {
+                                 "TYPE_NAME": "SLD_1_0_0.ColorMapEntry",
+                                 "color": "#00ff00",
+                                 "quantity": 40
+                               },
+                               {
+                                 "TYPE_NAME": "SLD_1_0_0.ColorMapEntry",
+                                 "color": "#ffff00",
+                                 "quantity": 60
+                               },
+                               {
+                                 "TYPE_NAME": "SLD_1_0_0.ColorMapEntry",
+                                 "color": "#ff0000",
+                                 "quantity": 80
+                               }
+                             ]
+                           }
+                         }
+                       }
+                     ]
+                   }
+                 ]
+               }
+             ]
+           }
+         ]
+       }
+     ]
+   }
+ };
+
+
+var sld_xml = marshaller.marshalString(sld_json)
+
 var map = new Map({
     target: 'map',
 		controls: defaultControls().extend([
@@ -72,13 +168,32 @@ var map = new Map({
 												attributions: '© <a href="https://aksgeoscience.com" >AKS Geoscience</a>',
 													params: {
 														'LAYERS':'site_10_11_26_13_02w4_31,site_11_16_20_013_02w4_31,site_12_16_27_013_02w4_31,site_13_08_22_013_02w4_31,site_14_06_29_013_03w4_31,site_15_06_33_013_02w4_31,site_16_08_26_013_03w4_31,site_17_08_29_013_03w4_31,site_18_08_32_013_03w4_31,site_19_06_24_016_02w4_31,site_1_15_25_014_02w4_31,site_20_10_11_015_02w4_31,site_21_14_19_016_01w4_31,site_22_14_24_016_02w4_31,site_23_16_09_015_01w4_31,site_24_16_24_016_02w4_31,site_25_05_15_016_02w4_31,site_26_08_15_016_02w4_31,site_27_14_23_016_02w4_31,site_28_14_35_017_01w4_31,site_29_16_23_016_02w4_31,site_2_16_25_014_02w4_31,site_30_04_20_019_01w4_31,site_31_04_21_019_01w4_31,site_32_06_16_019_01w4_31,site_33_06_17_019_01w4_31,site_34_10_16_019_01w4_31,site_35_10-17-019-01w4_31,site_3_02_36_014_02w4_31,site_4_06_36_014_02w4_31,site_5_08_03_015_02w4_31,site_6_08_27_014_02w4_31,site_7_14_18_015_01w4_31,site_8_06_32_013_02w4_31,site_9_10_30_013_02w4_31',
-														'TILED': true
-													},
+														'TILED': true													},
 										  serverType: 'geoserver',
 										//  enableOpacitySliders: true
 										//  transition: 0,
 								}),
 					 }),
+
+			new TileLayer({
+			    title: 'TEST',
+					//extent: [-13884991, 2870341, -7455066, 6338219],
+					preload: Infinity,
+					visible: true,
+					source: new TileWMS({
+					       url: 'https://larsenwest.ca:8443/geoserver/Canlin/wms',
+					       attributions: '© <a href="https://aksgeoscience.com" >AKS Geoscience</a>',
+								 params: {
+								           'LAYERS':'site_21_14_19_016_01w4_31',
+													 'TILED': true,
+                           //'STYLES': 'test_rs',
+                           'SLD_BODY': sld_xml
+								 },
+								 serverType: 'geoserver',
+								 //  enableOpacitySliders: true
+								 //  transition: 0,
+             }),
+			  }) ,
 					  new TileLayer({
 									  				  title: 'EM track',
 										//extent: [-13884991, 2870341, -7455066, 6338219],
