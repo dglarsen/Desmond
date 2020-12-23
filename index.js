@@ -27,6 +27,43 @@ import LayerSwitcher from 'ol-ext/control/LayerSwitcher';
 import SearchFeature from 'ol-ext/control/SearchFeature';
 import Select from 'ol-ext/control/Select';
 
+var ColorScaleControl = /*@__PURE__*/(function (Control) {
+  function ColorScaleControl(opt_options) {
+    var options = opt_options || {};
+
+    var minimum = document.createElement('input');
+    minimum.type = "number";
+
+    var maximum = document.createElement('input');
+    maximum.type = "number";
+
+    var element = document.createElement('div');
+    element.id = 'ColorScale';
+    element.className = 'rotate-north ol-unselectable ol-control';
+    element.appendChild(minimum);
+    element.appendChild(maximum);
+
+    Control.call(this, {
+      element: element,
+      target: options.target,
+    });
+
+    minimum.addEventListener('change', this.handleMinimumChange.bind(this), false);
+    minimum.addEventListener('change', this.handleMaximumChange.bind(this), false);
+  }
+
+  if ( Control ) ColorScaleControl.__proto__ = Control;
+  ColorScaleControl.prototype = Object.create( Control && Control.prototype );
+  ColorScaleControl.prototype.constructor = ColorScaleControl;
+
+  ColorScaleControl.prototype.handleMinimumChange = function handleMinimumChange () {
+  };
+
+  ColorScaleControl.prototype.handleMaximumChange = function handleMinimumChange () {
+  };
+
+  return ColorScaleControl;
+}(Control));
 
 var vectorSource = new VectorSource({
   format: new GeoJSON(),
@@ -149,7 +186,7 @@ var vectorSource = new VectorSource({
            "namedStyleOrUserStyle": [
              {
                "TYPE_NAME": "SLD_1_0_0.UserStyle",
-               "title": "FocusedGeo Rainbow Scale",
+               "title": "test",
                "featureTypeStyle": [
                  {
                    "TYPE_NAME": "SLD_1_0_0.FeatureTypeStyle",
@@ -182,27 +219,27 @@ var vectorSource = new VectorSource({
                                "colorMapEntry": [
                                  {
                                    "TYPE_NAME": "SLD_1_0_0.ColorMapEntry",
-                                   "color": "#0000ff",
+                                   "color": "#ffffff",
                                    "quantity": 0
                                  },
                                  {
                                    "TYPE_NAME": "SLD_1_0_0.ColorMapEntry",
-                                   "color": "#00ffff",
+                                   "color": "#dddddd",
                                    "quantity": 20
                                  },
                                  {
                                    "TYPE_NAME": "SLD_1_0_0.ColorMapEntry",
-                                   "color": "#00ff00",
+                                   "color": "#bbbbbb",
                                    "quantity": 40
                                  },
                                  {
                                    "TYPE_NAME": "SLD_1_0_0.ColorMapEntry",
-                                   "color": "#ffff00",
+                                   "color": "#999999",
                                    "quantity": 60
                                  },
                                  {
                                    "TYPE_NAME": "SLD_1_0_0.ColorMapEntry",
-                                   "color": "#ff0000",
+                                   "color": "#777777",
                                    "quantity": 80
                                  }
                                ]
@@ -220,7 +257,17 @@ var vectorSource = new VectorSource({
      ]
    }
  };
-
+ 
+var sites_source = new TileWMS({
+      url: 'https://larsenwest.ca:8443/geoserver/Canlin/wms',
+    attributions: '© <a href="https://aksgeoscience.com" >AKS Geoscience</a>',
+      params: {
+        'LAYERS':'site_10_11_26_13_02w4_31,site_11_16_20_013_02w4_31,site_12_16_27_013_02w4_31,site_13_08_22_013_02w4_31,site_14_06_29_013_03w4_31,site_15_06_33_013_02w4_31,site_16_08_26_013_03w4_31,site_17_08_29_013_03w4_31,site_18_08_32_013_03w4_31,site_19_06_24_016_02w4_31,site_1_15_25_014_02w4_31,site_20_10_11_015_02w4_31,site_21_14_19_016_01w4_31,site_22_14_24_016_02w4_31,site_23_16_09_015_01w4_31,site_24_16_24_016_02w4_31,site_25_05_15_016_02w4_31,site_26_08_15_016_02w4_31,site_27_14_23_016_02w4_31,site_28_14_35_017_01w4_31,site_29_16_23_016_02w4_31,site_2_16_25_014_02w4_31,site_30_04_20_019_01w4_31,site_31_04_21_019_01w4_31,site_32_06_16_019_01w4_31,site_33_06_17_019_01w4_31,site_34_10_16_019_01w4_31,site_35_10-17-019-01w4_31,site_3_02_36_014_02w4_31,site_4_06_36_014_02w4_31,site_5_08_03_015_02w4_31,site_6_08_27_014_02w4_31,site_7_14_18_015_01w4_31,site_8_06_32_013_02w4_31,site_9_10_30_013_02w4_31',
+        'TILED': true													},
+  serverType: 'geoserver',
+//  enableOpacitySliders: true
+//  transition: 0,
+});
 
 var sld_xml = marshaller.marshalString(sld_json);
 console.log(sld_xml);
@@ -229,7 +276,8 @@ var map = new Map({
     target: 'map',
 		controls: defaultControls().extend([
 					new FullScreen(),
-					new ScaleLine()
+					new ScaleLine(),
+          new ColorScaleControl()
 					]),
 	layers: [
         new TileLayer({
@@ -250,16 +298,7 @@ var map = new Map({
 										//extent: [-13884991, 2870341, -7455066, 6338219],
 										preload: Infinity,
 										visible: true,
-										source: new TileWMS({
-												  url: 'https://larsenwest.ca:8443/geoserver/Canlin/wms',
-												attributions: '© <a href="https://aksgeoscience.com" >AKS Geoscience</a>',
-													params: {
-														'LAYERS':'site_10_11_26_13_02w4_31,site_11_16_20_013_02w4_31,site_12_16_27_013_02w4_31,site_13_08_22_013_02w4_31,site_14_06_29_013_03w4_31,site_15_06_33_013_02w4_31,site_16_08_26_013_03w4_31,site_17_08_29_013_03w4_31,site_18_08_32_013_03w4_31,site_19_06_24_016_02w4_31,site_1_15_25_014_02w4_31,site_20_10_11_015_02w4_31,site_21_14_19_016_01w4_31,site_22_14_24_016_02w4_31,site_23_16_09_015_01w4_31,site_24_16_24_016_02w4_31,site_25_05_15_016_02w4_31,site_26_08_15_016_02w4_31,site_27_14_23_016_02w4_31,site_28_14_35_017_01w4_31,site_29_16_23_016_02w4_31,site_2_16_25_014_02w4_31,site_30_04_20_019_01w4_31,site_31_04_21_019_01w4_31,site_32_06_16_019_01w4_31,site_33_06_17_019_01w4_31,site_34_10_16_019_01w4_31,site_35_10-17-019-01w4_31,site_3_02_36_014_02w4_31,site_4_06_36_014_02w4_31,site_5_08_03_015_02w4_31,site_6_08_27_014_02w4_31,site_7_14_18_015_01w4_31,site_8_06_32_013_02w4_31,site_9_10_30_013_02w4_31',
-														'TILED': true													},
-										  serverType: 'geoserver',
-										//  enableOpacitySliders: true
-										//  transition: 0,
-								}),
+										source: sites_source,
 					 }),
 
 			new TileLayer({
@@ -273,7 +312,7 @@ var map = new Map({
 								 params: {
 								           'LAYERS':'Canlin:site_10_11_26_13_02w4_31, Canlin:site_21_14_19_016_01w4_31',
 													 'TILED': true,
-                           //'STYLES': 'test_rs',
+                           //'STYLES': 'test,FocusedGeo Rainbow Scale',
                            'SLD_BODY': sld_xml
 								 },
 								 serverType: 'geoserver',
