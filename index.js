@@ -26,10 +26,44 @@ import {Control, defaults as defaultControls} from 'ol/control';
 import LayerSwitcher from 'ol-ext/control/LayerSwitcher';
 import SearchFeature from 'ol-ext/control/SearchFeature';
 import Select from 'ol-ext/control/Select';
+import WMSCapabilities from 'ol/format/WMSCapabilities';
 
 // TODO: fix this ugly hack, bad bad bad
 var minimum = document.createElement('input');
 var maximum = document.createElement('input');
+
+var parser = new WMSCapabilities();
+var url = "https://larsenwest.ca:8443/geoserver/Canlin/wms";
+var capabilities;
+fetch("https://larsenwest.ca:8443/geoserver/wms?service=WMS&version=1.1.1&request=GetCapabilities")
+  .then(function(response) {
+    response.text().then(function(data) {
+      capabilities = parser.read(data);
+      console.log(capabilities);
+      // layername
+      console.log(capabilities['Capability']['Layer']['Layer'].find(
+        function(element) {
+          return element['Name'] == 'Canlin:site_21_14_19_016_01w4_31';
+        }
+      ));
+
+    });
+
+  });
+  /*,
+ success: function(e){
+  var response = parser.read(e.responseText);
+  var capability = response.capability;
+  for (var i=0, len=capability.layers.length; i<len; i+=1) {
+  var layerObj = capability.layers[i];
+  if (layerObj.name === 'cite:'+layers) {
+  var bounds=OpenLayers.Bounds.fromArray(layerObj.bbox).transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:3857") );
+    mapPanel.map.zoomToExtent(bounds);
+    break;
+  }
+  }
+  }
+});*/
 
 var ColorScaleControl = /*@__PURE__*/(function (Control) {
   function ColorScaleControl(opt_options) {
@@ -224,7 +258,7 @@ function tileLayerFactory(site, sld_xml) {
   return new TileLayer({
       title: title,
       //extent: [-13884991, 2870341, -7455066, 6338219],
-      preload: Infinity,
+      preload: 0,
       visible: true,
       source: new TileWMS({
              url: 'https://larsenwest.ca:8443/geoserver/Canlin/wms',
@@ -238,8 +272,7 @@ function tileLayerFactory(site, sld_xml) {
              serverType: 'geoserver',
              //  enableOpacitySliders: true
              //  transition: 0,
-         }),
-        'SLD_BODY': sld_xml
+         })
     })
 }
 
@@ -251,27 +284,9 @@ for (let site_index in sites_list) {
   var sld_xml = marshaller.marshalString(sld_json);
   var layer = tileLayerFactory(sites_list[site_index], sld_xml);
   layer_list.push(layer);
+  console.log(layer.getExtent());
 }
 
-/*******Temporary Code for testing**************/
-var sites_list = ["Canlin:site_10_11_26_13_02w4_31", "Canlin:site_21_14_19_016_01w4_31"];
-var sld_json = sldJSONFactory(sites_list);
-
-var sld_xml = marshaller.marshalString(sld_json);
-
-var sites_source = new TileWMS({
-      url: 'https://larsenwest.ca:8443/geoserver/Canlin/wms',
-    attributions: '© <a href="https://aksgeoscience.com" >AKS Geoscience</a>',
-      params: {
-        'LAYERS':'site_10_11_26_13_02w4_31,site_11_16_20_013_02w4_31,site_12_16_27_013_02w4_31,site_13_08_22_013_02w4_31,site_14_06_29_013_03w4_31,site_15_06_33_013_02w4_31,site_16_08_26_013_03w4_31,site_17_08_29_013_03w4_31,site_18_08_32_013_03w4_31,site_19_06_24_016_02w4_31,site_1_15_25_014_02w4_31,site_20_10_11_015_02w4_31,site_21_14_19_016_01w4_31,site_22_14_24_016_02w4_31,site_23_16_09_015_01w4_31,site_24_16_24_016_02w4_31,site_25_05_15_016_02w4_31,site_26_08_15_016_02w4_31,site_27_14_23_016_02w4_31,site_28_14_35_017_01w4_31,site_29_16_23_016_02w4_31,site_2_16_25_014_02w4_31,site_30_04_20_019_01w4_31,site_31_04_21_019_01w4_31,site_32_06_16_019_01w4_31,site_33_06_17_019_01w4_31,site_34_10_16_019_01w4_31,site_35_10-17-019-01w4_31,site_3_02_36_014_02w4_31,site_4_06_36_014_02w4_31,site_5_08_03_015_02w4_31,site_6_08_27_014_02w4_31,site_7_14_18_015_01w4_31,site_8_06_32_013_02w4_31,site_9_10_30_013_02w4_31',
-        'TILED': true
-      },
-  serverType: 'geoserver',
-//  enableOpacitySliders: true
-//  transition: 0,
-});
-
-/*******END: Temporary Code for testing**************/
 var map = new Map({
     target: 'map',
 		controls: defaultControls().extend([
@@ -387,7 +402,7 @@ var map = new Map({
            }),
            }),
 
-		    ].concat(layer_list),
+		    ],//.concat(layer_list),
 
   view: new View({
     center: [ -12260934,6510959],
