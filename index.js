@@ -27,6 +27,20 @@ import LayerSwitcher from 'ol-ext/control/LayerSwitcher';
 import SearchFeature from 'ol-ext/control/SearchFeature';
 import Select from 'ol-ext/control/Select';
 import WMSCapabilities from 'ol/format/WMSCapabilities';
+import proj4 from 'proj4';
+import {transformExtent} from 'ol/proj';
+import {register} from 'ol/proj/proj4';
+import Projection from 'ol/proj/Projection';
+
+proj4.defs(
+  'EPSG:26912',
+  '+proj=utm +zone=12 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs '
+);
+register(proj4);
+var projection = new Projection({
+  code: 'EPSG:26912',
+  extent: [-6587424.26, 4758045.90, 853099.84, 9819951.93],
+});
 
 // TODO: fix this ugly hack, bad bad bad
 var minimum = document.createElement('input');
@@ -40,13 +54,20 @@ fetch("https://larsenwest.ca:8443/geoserver/wms?service=WMS&version=1.1.1&reques
     response.text().then(function(data) {
       capabilities = parser.read(data);
       console.log(capabilities);
-      // layername
-      console.log(capabilities['Capability']['Layer']['Layer'].find(
-        function(element) {
-          return element['Name'] == 'Canlin:site_21_14_19_016_01w4_31';
-        }
-      ));
 
+      for (let layer_index in layer_list) {
+        var layer = layer_list[layer_index];
+        layer.setExtent(
+          capabilities['Capability']['Layer']['Layer'].find(
+            function(element) {
+              // UTM ZONE 11 vs Google Proj
+              return element['Name'] == layer.getSource().getParams()['LAYERS'];
+            }
+          )['BoundingBox'][0]['extent']
+        );
+        console.log(layer.getExtent());
+
+      }
     });
 
   });
@@ -387,6 +408,7 @@ var map = new Map({
 								}),
 					 }),*/
 
+           //TODO: Reproject layer as it is added to the map
            new VectorLayer({
            source: vectorSource,
            title: "Sites as Vectors",
@@ -402,10 +424,11 @@ var map = new Map({
            }),
            }),
 
-		    ],//.concat(layer_list),
+		    ].concat(layer_list),
 
   view: new View({
-    center: [ -12260934,6510959],
+    center: [ 560047.3564453125, 5579762.766126984],
+    projection: projection,
     zoom: 9
   }),
 
