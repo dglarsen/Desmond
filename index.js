@@ -53,7 +53,6 @@ fetch("https://larsenwest.ca:8443/geoserver/wms?service=WMS&version=1.1.1&reques
   .then(function(response) {
     response.text().then(function(data) {
       capabilities = parser.read(data);
-      console.log(capabilities);
 
       for (let layer_index in layer_list) {
         var layer = layer_list[layer_index];
@@ -65,8 +64,6 @@ fetch("https://larsenwest.ca:8443/geoserver/wms?service=WMS&version=1.1.1&reques
             }
           )['BoundingBox'][0]['extent']
         );
-        console.log(layer.getExtent());
-
       }
     });
 
@@ -132,7 +129,7 @@ var ColorScaleControl = /*@__PURE__*/(function (Control) {
 
 var vectorSource = new VectorSource({
   format: new GeoJSON(),
-  url: 'https://larsenwest.ca:8443/geoserver/focusedgeo_postgis/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=focusedgeo_postgis:Canlin_EM_LIST_dec15&maxFeatures=50&outputFormat=application/json'
+  url: 'https://larsenwest.ca:8443/geoserver/focusedgeo_postgis/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=focusedgeo_postgis:Canlin_EM_LIST_dec15&maxFeatures=50&outputFormat=application/json&srsname=EPSG:26912'
     });
 
  var fill = new Fill({
