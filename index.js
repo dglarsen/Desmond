@@ -7,7 +7,7 @@ import BingMaps from 'ol/source/BingMaps';
 import Map from 'ol/Map';
 import View from 'ol/View';
 import { transform } from 'ol/proj';
-import {Fill, Stroke, Circle, Style} from 'ol/style';
+import {Fill, Stroke, Circle, Style, Text} from 'ol/style';
 import GeoJSON from 'ol/format/GeoJSON';
 import LayerGroup from 'ol/layer/Group';
 import ImageLayer from 'ol/layer/Image';
@@ -31,6 +31,7 @@ import proj4 from 'proj4';
 import {transformExtent} from 'ol/proj';
 import {register} from 'ol/proj/proj4';
 import Projection from 'ol/proj/Projection';
+import FeatureSelect from 'ol/interaction/Select';
 
 proj4.defs(
   'EPSG:26912',
@@ -41,6 +42,33 @@ var projection = new Projection({
   code: 'EPSG:26912',
   extent: [-6587424.26, 4758045.90, 853099.84, 9819951.93],
 });
+
+var labelStyle = new Style({
+			text: new Text({
+								font: '12px Calibri,sans-serif',
+								rotation:0,
+								textAlign: 'left',
+								overflow: true,
+								fill: new Fill({
+										  color: '#000',
+										}),
+					stroke: new Stroke({
+					  color: '#fff',
+					  width: 3,
+					}),
+				}),
+
+});
+
+var wellStyle = new Style({
+   image: new Circle({
+      radius: 10,
+      fill: new Fill({color: 'rgba(255, 0, 0, 0.1)'}),
+      stroke: new Stroke({color: 'blue', width: 1}),
+    }),
+});
+
+var style = [wellStyle, labelStyle];
 
 // TODO: fix this ugly hack, bad bad bad
 var minimum = document.createElement('input');
@@ -334,6 +362,20 @@ for (let site_index in sites_list_38) {
   var layer = tileLayerFactory(sites_list_38[site_index], sld_xml);
   layer_list_38.push(layer);
 }
+var sites_vector_layer = new VectorLayer({
+  source: vectorSource,
+  title: "Sites as Vectors",
+  style:
+  new Style({
+    image: new Circle({
+      fill: fill,
+      stroke: stroke,
+      radius: 5
+    }),
+    fill: fill,
+    stroke: stroke
+  }),
+});
 
 var map = new Map({
     target: 'map',
@@ -392,21 +434,7 @@ var map = new Map({
 								}),
 					 }),
 
-           //TODO: Reproject layer as it is added to the map
-           new VectorLayer({
-           source: vectorSource,
-           title: "Sites as Vectors",
-           style:
-           new Style({
-           image: new Circle({
-           fill: fill,
-           stroke: stroke,
-           radius: 5
-           }),
-           fill: fill,
-           stroke: stroke
-           }),
-           }),
+           sites_vector_layer,
            new LayerGroup({
              title: "EM31",
              layers: layer_list_31
@@ -435,6 +463,20 @@ var map = new Map({
       minLength: 0
 		});
 	map.addControl (search);
+
+  var feature_select = new FeatureSelect();
+
+  map.addInteraction(feature_select);
+  feature_select.on('select', function (e)
+  {
+    if(e.selected[0])
+      e.selected[0].setStyle(function (feature) {
+        labelStyle.getText().setText(feature.get('wellid'));
+		      return style;
+		  });
+
+    //var style = sites_vector_layer.getStyle();
+  });
 
 	// Select feature when click on the reference index
 	search.on('select', function(e)
