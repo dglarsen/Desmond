@@ -131,7 +131,7 @@ var ColorScaleControl = /*@__PURE__*/(function (Control) {
     minimum.value = 0;
 
     maximum.type = "number";
-    maximum.value = 10;
+    maximum.value = 50;
 
     var element = document.createElement('div');
     element.id = 'ColorScale';
@@ -347,7 +347,8 @@ var sites_list_31 = ['Canlin:site_10_11_26_13_02w4_31', 'Canlin:site_11_16_20_01
 
 var layer_list_31 = [];
 for (let site_index in sites_list_31) {
-  var sld_json = sldJSONFactory([sites_list_31[site_index]], 0, 10);
+  // TODO: Fix this so that it uses the default value given in the control
+  var sld_json = sldJSONFactory([sites_list_31[site_index]], 0, 50);
   var sld_xml = marshaller.marshalString(sld_json);
   var layer = tileLayerFactory(sites_list_31[site_index], sld_xml);
   layer_list_31.push(layer);
@@ -357,7 +358,8 @@ var sites_list_38 = ['Canlin:site_10_11_26_13_02w4_38', 'Canlin:site_11_16_20_01
 
 var layer_list_38 = [];
 for (let site_index in sites_list_38) {
-  var sld_json = sldJSONFactory([sites_list_38[site_index]], 0, 10);
+  // TODO: Fix this so that it uses the default value given in the control
+  var sld_json = sldJSONFactory([sites_list_38[site_index]], 0, 50);
   var sld_xml = marshaller.marshalString(sld_json);
   var layer = tileLayerFactory(sites_list_38[site_index], sld_xml);
   layer_list_38.push(layer);
