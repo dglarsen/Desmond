@@ -343,7 +343,7 @@ function tileLayerFactory(site, sld_xml) {
     })
 }
 
-var sites_list_31 = ['Canlin:site_10_11_26_13_02w4_31', 'Canlin:site_11_16_20_013_02w4_31', 'Canlin:site_12_16_27_013_02w4_31', 'Canlin:site_13_08_22_013_02w4_31', 'Canlin:site_14_06_29_013_03w4_31', 'Canlin:site_15_06_33_013_02w4_31', 'Canlin:site_16_08_26_013_03w4_31', 'Canlin:site_17_08_29_013_03w4_31', 'Canlin:site_18_08_32_013_03w4_31', 'Canlin:site_19_06_24_016_02w4_31', 'Canlin:site_1_15_25_014_02w4_31', 'Canlin:site_20_10_11_015_02w4_31', 'Canlin:site_21_14_19_016_01w4_31', 'Canlin:site_22_14_24_016_02w4_31', 'Canlin:site_23_16_09_015_01w4_31', 'Canlin:site_24_16_24_016_02w4_31', 'Canlin:site_25_05_15_016_02w4_31', 'Canlin:site_26_08_15_016_02w4_31', 'Canlin:site_27_14_23_016_02w4_31', 'Canlin:site_28_14_35_017_01w4_31', 'Canlin:site_29_16_23_016_02w4_31', 'Canlin:site_2_16_25_014_02w4_31', 'Canlin:site_30_04_20_019_01w4_31', 'Canlin:site_31_04_21_019_01w4_31', 'Canlin:site_32_06_16_019_01w4_31', 'Canlin:site_33_06_17_019_01w4_31', 'Canlin:site_34_10_16_019_01w4_31', 'Canlin:site_35_10-17-019-01w4_31', 'Canlin:site_3_02_36_014_02w4_31', 'Canlin:site_4_06_36_014_02w4_31', 'Canlin:site_5_08_03_015_02w4_31', 'Canlin:site_6_08_27_014_02w4_31', 'Canlin:site_7_14_18_015_01w4_31', 'Canlin:site_8_06_32_013_02w4_31', 'Canlin:site_9_10_30_013_02w4_31'];
+var sites_list_31 = ['Canlin:site_10_11_26_13_02w4_31', 'Canlin:site_11_16_20_013_02w4_31', 'Canlin:site_12_16_27_013_02w4_31', 'Canlin:site_13_08_22_013_02w4_31', 'Canlin:site_14_06_29_013_03w4_31', 'Canlin:site_15_06_33_013_02w4_31', 'Canlin:site_16_08_26_013_03w4_31', 'Canlin:site_17_08_29_013_03w4_31', 'Canlin:site_18_08_32_013_03w4_31', 'Canlin:site_19_06_24_016_02w4_31', 'Canlin:site_1_15_25_014_02w4_31', 'Canlin:site_20_10_11_015_02w4_31', 'Canlin:site_21_14_19_016_01w4_31', 'Canlin:site_22_14_24_016_02w4_31', 'Canlin:site_23_16_09_015_01w4_31', 'Canlin:site_24_16_24_016_02w4_31', 'Canlin:site_25_05_15_016_02w4_31', 'Canlin:site_26_08_15_016_02w4_31', 'Canlin:site_27_14_23_016_02w4_31', 'Canlin:site_28_14_35_017_01w4_31', 'Canlin:site_29_16_23_016_02w4_31', 'Canlin:site_2_16_25_014_02w4_31', 'Canlin:site_30_04_20_019_01w4_31', 'Canlin:site_31_04_21_019_01w4_31', 'Canlin:site_32_06_16_019_01w4_31', 'Canlin:site_33_06_17_019_01w4_31', 'Canlin:site_34_10_16_019_01w4_31', 'Canlin:site_35_10_17_019_01w4_31', 'Canlin:site_3_02_36_014_02w4_31', 'Canlin:site_4_06_36_014_02w4_31', 'Canlin:site_5_08_03_015_02w4_31', 'Canlin:site_6_08_27_014_02w4_31', 'Canlin:site_7_14_18_015_01w4_31', 'Canlin:site_8_06_32_013_02w4_31', 'Canlin:site_9_10_30_013_02w4_31'];
 
 var layer_list_31 = [];
 for (let site_index in sites_list_31) {
@@ -387,12 +387,12 @@ var map = new Map({
           new ColorScaleControl()
 					]),
 	layers: [
-        new TileLayer({
-			  visible: true,
-			  title: "Bing",
-			  preload: Infinity,
-			  source: new BingMaps({
-				key:
+    new TileLayer({
+		  visible: true,
+			title: "Bing",
+			preload: Infinity,
+			source: new BingMaps({
+			  key:
 				'82o22Jd9KBSXdi7KOw9F~-ljDB0Kkf0oF-Egpwvb9_w~Aqsa-2Is6gI2fOr88_Kgqe8RC041lQaheYQt9ISHnZ2L4jpJkBerWGqwZ2t31CRV',
 				imagerySet: 'Aerial',
 				// use maxZoom 19 to see stretched tiles instead of the BingMaps
@@ -400,6 +400,24 @@ var map = new Map({
 				 maxZoom: 19
        }),
 			}),
+    new TileLayer({
+        title: "Sattelite",
+        //extent: [-13884991, 2870341, -7455066, 6338219],
+        preload: 0,
+        visible: true,
+        source: new TileWMS({
+               url: 'https://larsenwest.ca:8443/geoserver/Canlin/wms',
+               attributions: '© <a href="https://aksgeoscience.com" >AKS Geoscience</a>',
+               params: {
+                         'LAYERS': "srfi_pan_ortho_mosaic_Composite",
+                         'TILED': true,
+               },
+               serverType: 'geoserver',
+               //  enableOpacitySliders: true
+               //  transition: 0,
+           })
+      }),
+
 
 					  new TileLayer({
 									  				  title: 'EM track',
