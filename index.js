@@ -17,7 +17,7 @@ import TileWMS from "ol/source/TileWMS";
 import FullScreen from "ol/control/FullScreen";
 import Attribution from "ol/control/Attribution";
 import LayerSwitcher from "ol-ext/control/LayerSwitcher";
-import SearchFeature from "ol-ext/control/SearchFeature";
+import SearchFeature from "./FGSearchFeature.js";
 import WMSCapabilities from "ol/format/WMSCapabilities";
 import proj4 from "proj4";
 import { register } from "ol/proj/proj4";
@@ -768,8 +768,26 @@ var search = new SearchFeature({
   placeholder: "Site Name",
   maxItems: 1000
 });
-search.getInputField();
-search.search();
+;
+
+search.getInputField().addEventListener("focus", function (e) {
+  console.log("Focused");
+  search.search();
+  search.drawList_("*");
+});
+
+// Select feature when click on the reference index
+search.on("select", function (e) {
+  // select.getFeatures().clear();
+  // select.getFeatures().push (e.search);
+  var p = e.search.getGeometry().getFirstCoordinate();
+  map.getView().animate({
+    center: p,
+    zoom: 17
+  });
+});
+
+
 map.addControl(search);
 
 var feature_select = new FeatureSelect();
@@ -783,17 +801,6 @@ feature_select.on("select", function (e) {
     });
 
   //var style = sites_vector_layer.getStyle();
-});
-
-// Select feature when click on the reference index
-search.on("select", function (e) {
-  // select.getFeatures().clear();
-  // select.getFeatures().push (e.search);
-  var p = e.search.getGeometry().getFirstCoordinate();
-  map.getView().animate({
-    center: p,
-    zoom: 17
-  });
 });
 
 //print to scale
