@@ -1,35 +1,34 @@
-import Control from "ol/control";
+
+import Control from 'ol/control/Control'
 
 //ColorScale
 var ColorScaleControl = /*@__PURE__*/ (function (Control) {
-  ColorScaleControl.prototype.minimum = NULL;
-  ColorScaleControl.prototype.maximum = NULL;
-  
+
   function ColorScaleControl(opt_options) {
     var options = opt_options || {};
 
     this.minimum = document.createElement("input");
     this.maximum = document.createElement("input");
 
-    minimum.type = "number";
-    minimum.value = 0;
+    this.minimum.type = "number";
+    this.minimum.value = 0;
 
-    maximum.type = "number";
-    maximum.value = 50;
+    this.maximum.type = "number";
+    this.maximum.value = 50;
 
     var element = document.createElement("div");
     element.id = "ColorScale";
     element.className = "rotate-north ol-unselectable ol-control";
-    element.appendChild(minimum);
-    element.appendChild(maximum);
+    element.appendChild(this.minimum);
+    element.appendChild(this.maximum);
 
     Control.call(this, {
       element: element,
       target: options.target
     });
 
-    minimum.addEventListener("change", this.handleChange.bind(this), false);
-    maximum.addEventListener("change", this.handleChange.bind(this), false);
+    this.minimum.addEventListener("change", this.handleChange.bind(this), false);
+    this.maximum.addEventListener("change", this.handleChange.bind(this), false);
   }
 
   if (Control) ColorScaleControl.__proto__ = Control;
@@ -77,11 +76,8 @@ var ColorScaleControl = /*@__PURE__*/ (function (Control) {
       source.updateParams(params);
     }
   };
-  ColorScaleControl.prototype.getMinimumInputElement() = function getMinimumInputElement() {
 
-  }
-  ColorScaleControl.prototype.getMaximumInputElement() = function getMaximumInputElement() {
-
-  }
   return ColorScaleControl;
 })(Control);
+
+export default ColorScaleControl
