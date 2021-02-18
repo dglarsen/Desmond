@@ -56,17 +56,25 @@
     		    bottom: 60px;
             right: 10px;
       }
+
+      #ColorScaleLegend {
+            pointer-events: none;
+            position: absolute;
+    		    bottom: 60px;
+            left: 10px;
+      }
+      #legend {
+        height: 300px;
+        width: 60px;
+      }
     </style>
   </head>
   <body>
     <div class="rel">
       <div id="map" class="map"></div>
       <div id="plot"></div>
-	  <div id="ColorScale"></div>
 		<div id="info">&nbsp;</div>
     </div>
-    Legend:
-    <div><img id="legend"/></div>
     <script src="index.js"></script>
   </body>
 </html>

@@ -31,6 +31,7 @@ import { fromLonLat } from "ol/proj";
 import ColorScaleControl from "./FGColorScaleControl"
 import SearchFeature from "./FGSearchFeature";
 import PrintScaleControl from "./FGPrintScaleControl";
+import ColorScaleLegendControl from "./FGColorScaleLegendControl";
 
 proj4.defs(
   "EPSG:26911",
@@ -126,11 +127,6 @@ var wmsSource = new ImageWMS({
   serverType: "geoserver",
   crossOrigin: "anonymous"
 });
-var updateLegend = function (resolution) {
-  var graphicUrl = wmsSource.getLegendUrl(resolution);
-  var img = document.getElementById("legend");
-  img.src = graphicUrl;
-};
 
 var minCond = 1;
 var maxCond = 100;
@@ -414,15 +410,11 @@ var map = new Map({
   ],
   view: view
 });
-// Initial legend
-var resolution = map.getView().getResolution();
-updateLegend(resolution);
 
-// Update the legend when the resolution changes
-map.getView().on("change:resolution", function (event) {
-  var resolution = event.target.getResolution();
-  updateLegend(resolution);
-});
+var color_scale_legend = new ColorScaleLegendControl(wmsSource);
+map.addControl(color_scale_legend);
+color_scale_legend.setup();
+
 // var layerSwitcher = new ol.control.LayerSwitcher({        enableOpacitySliders: true    });
 var layerSwitcher = new LayerSwitcher();
 map.addControl(layerSwitcher);
@@ -458,6 +450,7 @@ map.on("pointermove", function (evt) {
   map.getTargetElement().style.cursor = hit ? "pointer" : "";
 });
 var timer = null;
+
 function schedulePlot(resolution, counts, threshold) {
   if (timer) {
     clearTimeout(timer);
