@@ -29,7 +29,8 @@ import { getTopLeft, getWidth } from "ol/extent";
 import Graticule from "ol-ext/control/Graticule";
 import { fromLonLat } from "ol/proj";
 import ColorScaleControl from "./FGColorScaleControl"
-import SearchFeature from "./FGSearchFeature.js";
+import SearchFeature from "./FGSearchFeature";
+import PrintScaleControl from "./FGPrintScaleControl";
 
 proj4.defs(
   "EPSG:26911",
@@ -551,13 +552,13 @@ var search = new SearchFeature({
   maxItems: 1000
 });
 ;
-
+/*
 search.getInputField().addEventListener("focus", function (e) {
   console.log("Focused");
   search.search();
   search.drawList_("*");
 });
-
+*/
 // Select feature when click on the reference index
 search.on("select", function (e) {
   // select.getFeatures().clear();
@@ -585,81 +586,5 @@ feature_select.on("select", function (e) {
   //var style = sites_vector_layer.getStyle();
 });
 
-//print to scale
-var dims = {
-  a0: [1189, 841],
-  tabloid: [431.8, 279.4],
-  a2: [594, 420],
-  a3: [420, 297],
-  letter: [279.4, 215.9],
-  a5: [210, 148]
-};
-
-// export options for html-to-image.
-// See: https://github.com/bubkoo/html-to-image#options
-var exportOptions = {
-  filter: function (element) {
-    var className = element.className || "";
-    return (
-      className.indexOf("ol-control") === -1 ||
-      className.indexOf("ol-layerswitcher") === -1 ||
-      className.indexOf("ol-scale") > -1 ||
-      (className.indexOf("ol-attribution") > -1 &&
-        className.indexOf("ol-uncollapsible"))
-    );
-  }
-};
-
-var exportButton = document.getElementById("export-pdf");
-
-exportButton.addEventListener(
-  "click",
-  function () {
-    exportButton.disabled = true;
-    document.body.style.cursor = "progress";
-
-    var format = document.getElementById("format").value;
-    var resolution = document.getElementById("resolution").value;
-    var scale = document.getElementById("scale").value;
-    var dim = dims[format];
-    var width = Math.round((dim[0] * resolution) / 25.4);
-    var height = Math.round((dim[1] * resolution) / 25.4);
-    var viewResolution = map.getView().getResolution();
-    var scaleResolution =
-      scale /
-      getPointResolution(
-        map.getView().getProjection(),
-        resolution / 25.4,
-        map.getView().getCenter()
-      );
-
-    map.once("rendercomplete", function () {
-      exportOptions.width = width;
-      exportOptions.height = height;
-      domtoimage
-        .toJpeg(map.getViewport(), exportOptions)
-        .then(function (dataUrl) {
-          var pdf = new jsPDF("landscape", undefined, format);
-          pdf.addImage(dataUrl, "JPEG", 0, 0, dim[0], dim[1]);
-          pdf.save("map.pdf");
-          // Reset original map size
-          scaleLine.setDpi();
-          map.getTargetElement().style.width = "";
-          map.getTargetElement().style.height = "";
-          map.updateSize();
-          map.getView().setResolution(viewResolution);
-          exportButton.disabled = false;
-          document.body.style.cursor = "auto";
-        });
-    });
-
-    // Set print size
-    scaleLine.setDpi(resolution);
-    map.getTargetElement().style.width = width + "px";
-    map.getTargetElement().style.height = height + "px";
-    map.updateSize();
-    map.getView().setResolution(scaleResolution);
-  },
-  false
-);
-0.168;
+var print = new PrintScaleControl();
+map.addControl(print);
