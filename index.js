@@ -17,7 +17,6 @@ import TileWMS from "ol/source/TileWMS";
 import FullScreen from "ol/control/FullScreen";
 import Attribution from "ol/control/Attribution";
 import LayerSwitcher from "ol-ext/control/LayerSwitcher";
-import SearchFeature from "./FGSearchFeature.js";
 import WMSCapabilities from "ol/format/WMSCapabilities";
 import proj4 from "proj4";
 import { register } from "ol/proj/proj4";
@@ -30,6 +29,7 @@ import { getTopLeft, getWidth } from "ol/extent";
 import Graticule from "ol-ext/control/Graticule";
 import { fromLonLat } from "ol/proj";
 import ColorScaleControl from "./FGColorScaleControl"
+import SearchFeature from "./FGSearchFeature.js";
 
 proj4.defs(
   "EPSG:26911",
@@ -236,142 +236,7 @@ var stroke = new Stroke({
   width: 1.25
 });
 
-var Jsonix = require("jsonix").Jsonix;
-var XLink_1_0 = require("w3c-schemas").XLink_1_0;
-var GML_2_1_2 = require("ogc-schemas").GML_2_1_2;
-var Filter_1_0_0 = require("ogc-schemas").Filter_1_0_0;
-var SLD_1_0_0 = require("ogc-schemas").SLD_1_0_0;
-
-var context = new Jsonix.Context(
-  [SLD_1_0_0, GML_2_1_2, XLink_1_0, Filter_1_0_0],
-  {
-    namespacePrefixes: {
-      "http://www.w3.org/1999/xlink": "xlink",
-      "http://www.opengis.net/sld": "sld"
-    }
-  }
-);
-
-var marshaller = context.createMarshaller();
-
-function generateScale(minimum, maximum) {
-  if (!(maximum > minimum)) {
-    // TODO: fix this so we don't have hardcoded defaults, or better yet
-    // don't make requests for bad parameters
-    return [0, 20, 40, 60, 80];
-  }
-  var range = maximum - minimum;
-
-  var segment = range / 4.0;
-  var quantities = [];
-  for (var i = 0; i < 5; i++) {
-    quantities.push(minimum + i * segment);
-  }
-  return quantities;
-}
-
-function layerSLDJSONFactory(layer_name, minimum, maximum) {
-  var quantities = generateScale(minimum, maximum);
-  return {
-    TYPE_NAME: "SLD_1_0_0.NamedLayer",
-    name: layer_name,
-    namedStyleOrUserStyle: [
-      {
-        TYPE_NAME: "SLD_1_0_0.UserStyle",
-        title: "FocusedGeo Rainbow Scale",
-        featureTypeStyle: [
-          {
-            TYPE_NAME: "SLD_1_0_0.FeatureTypeStyle",
-            rule: [
-              {
-                TYPE_NAME: "SLD_1_0_0.Rule",
-                symbolizer: [
-                  {
-                    name: {
-                      namespaceURI: "http://www.opengis.net/sld",
-                      localPart: "IsDefault",
-                      prefix: "",
-                      key: "{http://www.opengis.net/sld}IsDefault",
-                      string: "{http://www.opengis.net/sld}IsDefault"
-                    },
-                    value: true
-                  },
-                  {
-                    name: {
-                      namespaceURI: "http://www.opengis.net/sld",
-                      localPart: "RasterSymbolizer",
-                      prefix: "",
-                      key: "{http://www.opengis.net/sld}RasterSymbolizer",
-                      string: "{http://www.opengis.net/sld}RasterSymbolizer"
-                    },
-                    value: {
-                      TYPE_NAME: "SLD_1_0_0.RasterSymbolizer",
-                      colorMap: {
-                        TYPE_NAME: "SLD_1_0_0.ColorMap",
-                        colorMapEntry: [
-                          {
-                            TYPE_NAME: "SLD_1_0_0.ColorMapEntry",
-                            color: "#0000ff",
-                            quantity: quantities[0]
-                          },
-                          {
-                            TYPE_NAME: "SLD_1_0_0.ColorMapEntry",
-                            color: "#00ffff",
-                            quantity: quantities[1]
-                          },
-                          {
-                            TYPE_NAME: "SLD_1_0_0.ColorMapEntry",
-                            color: "#00ff00",
-                            quantity: quantities[2]
-                          },
-                          {
-                            TYPE_NAME: "SLD_1_0_0.ColorMapEntry",
-                            color: "#ffff00",
-                            quantity: quantities[3]
-                          },
-                          {
-                            TYPE_NAME: "SLD_1_0_0.ColorMapEntry",
-                            color: "#ff0000",
-                            quantity: quantities[4]
-                          }
-                        ]
-                      }
-                    }
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  };
-}
-
-function sldJSONFactory(sites_list, minimum, maximum) {
-  var layer_sld_array = [];
-  for (let site_index in sites_list) {
-    layer_sld_array.push(
-      layerSLDJSONFactory(sites_list[site_index], minimum, maximum)
-    );
-  }
-  return {
-    name: {
-      namespaceURI: "http://www.opengis.net/sld",
-      localPart: "StyledLayerDescriptor",
-      prefix: "",
-      key: "{http://www.opengis.net/sld}StyledLayerDescriptor",
-      string: "{http://www.opengis.net/sld}StyledLayerDescriptor"
-    },
-    value: {
-      TYPE_NAME: "SLD_1_0_0.StyledLayerDescriptor",
-      version: "1.0.0",
-      namedLayerOrUserLayer: layer_sld_array
-    }
-  };
-}
-
-function tileLayerFactory(site, sld_xml) {
+function tileLayerFactory(site) {
   var title = site.split(":")[1];
   return new TileLayer({
     title: title,
@@ -386,9 +251,7 @@ function tileLayerFactory(site, sld_xml) {
       crossOrigin: "",
       params: {
         LAYERS: site,
-        TILED: true,
-        //'STYLES': 'test,FocusedGeo Rainbow Scale',
-        SLD_BODY: sld_xml
+        TILED: true
       },
       serverType: "geoserver"
       //  enableOpacitySliders: true
@@ -406,10 +269,7 @@ var sites_list_31 = [
 ];
 var layer_list_31 = [];
 for (let site_index in sites_list_31) {
-  // TODO: Fix this so that it uses the default value given in the control
-  var sld_json = sldJSONFactory([sites_list_31[site_index]], 0, 50);
-  var sld_xml = marshaller.marshalString(sld_json);
-  var layer = tileLayerFactory(sites_list_31[site_index], sld_xml);
+  var layer = tileLayerFactory(sites_list_31[site_index]);
   layer_list_31.push(layer);
 }
 
@@ -423,10 +283,7 @@ var sites_list_38 = [
 
 var layer_list_38 = [];
 for (let site_index in sites_list_38) {
-  // TODO: Fix this so that it uses the default value given in the control
-  var sld_json = sldJSONFactory([sites_list_38[site_index]], 0, 50);
-  var sld_xml = marshaller.marshalString(sld_json);
-  var layer = tileLayerFactory(sites_list_38[site_index], sld_xml);
+  var layer = tileLayerFactory(sites_list_38[site_index]);
   layer_list_38.push(layer);
 }
 var sites_list_mag = [
@@ -439,10 +296,7 @@ var sites_list_mag = [
 
 var layer_list_mag = [];
 for (let site_index in sites_list_mag) {
-  // TODO: Fix this so that it uses the default value given in the control
-  var sld_json = sldJSONFactory([sites_list_mag[site_index]], 0, 50);
-  var sld_xml = marshaller.marshalString(sld_json);
-  var layer = tileLayerFactory(sites_list_mag[site_index], sld_xml);
+  var layer = tileLayerFactory(sites_list_mag[site_index]);
   layer_list_mag.push(layer);
 }
 var sites_vector_layer = new VectorLayer({
@@ -474,7 +328,10 @@ var attribution = new Attribution({
 //grid
 
 //end of grid
-
+var colorScaleControl = new ColorScaleControl();
+colorScaleControl.setLayerList31(layer_list_31);
+colorScaleControl.setLayerList38(layer_list_38);
+colorScaleControl.setLayerListMag(layer_list_mag);
 var map = new Map({
   target: "map",
   units: "m",
@@ -483,7 +340,7 @@ var map = new Map({
     scaleLine,
     attribution,
     grat,
-    new ColorScaleControl()
+    colorScaleControl
   ]),
   layers: [
     new TileLayer({

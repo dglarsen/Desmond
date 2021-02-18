@@ -1,6 +1,141 @@
 
 import Control from 'ol/control/Control'
 
+var Jsonix = require("jsonix").Jsonix;
+var XLink_1_0 = require("w3c-schemas").XLink_1_0;
+var GML_2_1_2 = require("ogc-schemas").GML_2_1_2;
+var Filter_1_0_0 = require("ogc-schemas").Filter_1_0_0;
+var SLD_1_0_0 = require("ogc-schemas").SLD_1_0_0;
+
+var context = new Jsonix.Context(
+  [SLD_1_0_0, GML_2_1_2, XLink_1_0, Filter_1_0_0],
+  {
+    namespacePrefixes: {
+      "http://www.w3.org/1999/xlink": "xlink",
+      "http://www.opengis.net/sld": "sld"
+    }
+  }
+);
+
+var marshaller = context.createMarshaller();
+
+function generateScale(minimum, maximum) {
+  if (!(maximum > minimum)) {
+    // TODO: fix this so we don't have hardcoded defaults, or better yet
+    // don't make requests for bad parameters
+    return [0, 20, 40, 60, 80];
+  }
+  var range = maximum - minimum;
+
+  var segment = range / 4.0;
+  var quantities = [];
+  for (var i = 0; i < 5; i++) {
+    quantities.push(minimum + i * segment);
+  }
+  return quantities;
+}
+
+function layerSLDJSONFactory(layer_name, minimum, maximum) {
+  var quantities = generateScale(minimum, maximum);
+  return {
+    TYPE_NAME: "SLD_1_0_0.NamedLayer",
+    name: layer_name,
+    namedStyleOrUserStyle: [
+      {
+        TYPE_NAME: "SLD_1_0_0.UserStyle",
+        title: "FocusedGeo Rainbow Scale",
+        featureTypeStyle: [
+          {
+            TYPE_NAME: "SLD_1_0_0.FeatureTypeStyle",
+            rule: [
+              {
+                TYPE_NAME: "SLD_1_0_0.Rule",
+                symbolizer: [
+                  {
+                    name: {
+                      namespaceURI: "http://www.opengis.net/sld",
+                      localPart: "IsDefault",
+                      prefix: "",
+                      key: "{http://www.opengis.net/sld}IsDefault",
+                      string: "{http://www.opengis.net/sld}IsDefault"
+                    },
+                    value: true
+                  },
+                  {
+                    name: {
+                      namespaceURI: "http://www.opengis.net/sld",
+                      localPart: "RasterSymbolizer",
+                      prefix: "",
+                      key: "{http://www.opengis.net/sld}RasterSymbolizer",
+                      string: "{http://www.opengis.net/sld}RasterSymbolizer"
+                    },
+                    value: {
+                      TYPE_NAME: "SLD_1_0_0.RasterSymbolizer",
+                      colorMap: {
+                        TYPE_NAME: "SLD_1_0_0.ColorMap",
+                        colorMapEntry: [
+                          {
+                            TYPE_NAME: "SLD_1_0_0.ColorMapEntry",
+                            color: "#0000ff",
+                            quantity: quantities[0]
+                          },
+                          {
+                            TYPE_NAME: "SLD_1_0_0.ColorMapEntry",
+                            color: "#00ffff",
+                            quantity: quantities[1]
+                          },
+                          {
+                            TYPE_NAME: "SLD_1_0_0.ColorMapEntry",
+                            color: "#00ff00",
+                            quantity: quantities[2]
+                          },
+                          {
+                            TYPE_NAME: "SLD_1_0_0.ColorMapEntry",
+                            color: "#ffff00",
+                            quantity: quantities[3]
+                          },
+                          {
+                            TYPE_NAME: "SLD_1_0_0.ColorMapEntry",
+                            color: "#ff0000",
+                            quantity: quantities[4]
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+}
+
+function sldJSONFactory(sites_list, minimum, maximum) {
+  var layer_sld_array = [];
+  for (let site_index in sites_list) {
+    layer_sld_array.push(
+      layerSLDJSONFactory(sites_list[site_index], minimum, maximum)
+    );
+  }
+  return {
+    name: {
+      namespaceURI: "http://www.opengis.net/sld",
+      localPart: "StyledLayerDescriptor",
+      prefix: "",
+      key: "{http://www.opengis.net/sld}StyledLayerDescriptor",
+      string: "{http://www.opengis.net/sld}StyledLayerDescriptor"
+    },
+    value: {
+      TYPE_NAME: "SLD_1_0_0.StyledLayerDescriptor",
+      version: "1.0.0",
+      namedLayerOrUserLayer: layer_sld_array
+    }
+  };
+}
+
 //ColorScale
 var ColorScaleControl = /*@__PURE__*/ (function (Control) {
 
@@ -36,40 +171,40 @@ var ColorScaleControl = /*@__PURE__*/ (function (Control) {
   ColorScaleControl.prototype.constructor = ColorScaleControl;
 
   ColorScaleControl.prototype.handleChange = function handleChange() {
-    for (let layer_index in layer_list_31) {
-      var source = layer_list_31[layer_index].getSource();
+    for (let layer_index in this.layer_list_31) {
+      var source = this.layer_list_31[layer_index].getSource();
       var params = source.getParams();
       // TODO: this is fragile, will only work for sources with one layer
       var sld_json = sldJSONFactory(
         [params["LAYERS"]],
-        parseFloat(minimum.value),
-        parseFloat(maximum.value)
+        parseFloat(this.minimum.value),
+        parseFloat(this.maximum.value)
       );
       var sld_xml = marshaller.marshalString(sld_json);
       params["SLD_BODY"] = sld_xml;
       source.updateParams(params);
     }
-    for (let layer_index in layer_list_38) {
-      var source = layer_list_38[layer_index].getSource();
+    for (let layer_index in this.layer_list_38) {
+      var source = this.layer_list_38[layer_index].getSource();
       var params = source.getParams();
       // TODO: this is fragile, will only work for sources with one layer
       var sld_json = sldJSONFactory(
         [params["LAYERS"]],
-        parseFloat(minimum.value),
-        parseFloat(maximum.value)
+        parseFloat(this.minimum.value),
+        parseFloat(this.maximum.value)
       );
       var sld_xml = marshaller.marshalString(sld_json);
       params["SLD_BODY"] = sld_xml;
       source.updateParams(params);
     }
-    for (let layer_index in layer_list_mag) {
-      var source = layer_list_mag[layer_index].getSource();
+    for (let layer_index in this.layer_list_mag) {
+      var source = this.layer_list_mag[layer_index].getSource();
       var params = source.getParams();
       // TODO: this is fragile, will only work for sources with one layer
       var sld_json = sldJSONFactory(
         [params["LAYERS"]],
-        parseFloat(minimum.value),
-        parseFloat(maximum.value)
+        parseFloat(this.minimum.value),
+        parseFloat(this.maximum.value)
       );
       var sld_xml = marshaller.marshalString(sld_json);
       params["SLD_BODY"] = sld_xml;
@@ -77,6 +212,16 @@ var ColorScaleControl = /*@__PURE__*/ (function (Control) {
     }
   };
 
+  ColorScaleControl.prototype.setLayerList31 = function setLayerList31(list) {
+    this.layer_list_31 = list;
+    this.handleChange();
+  };
+  ColorScaleControl.prototype.setLayerList38 = function setLayerList38(list) {
+    this.layer_list_38 = list;
+  };
+  ColorScaleControl.prototype.setLayerListMag = function setLayerListMag(list) {
+    this.layer_list_mag = list;
+  };
   return ColorScaleControl;
 })(Control);
 
