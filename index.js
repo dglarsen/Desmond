@@ -242,10 +242,13 @@ var attribution = new Attribution({
 //grid
 
 //end of grid
-var colorScaleControl = new ColorScaleControl();
-colorScaleControl.setLayerList31(layer_list_31);
-colorScaleControl.setLayerList38(layer_list_38);
-colorScaleControl.setLayerListMag(layer_list_mag);
+var colorScaleControl31 = new ColorScaleControl();
+colorScaleControl31.setLayerList(layer_list_31);
+var colorScaleControl38 = new ColorScaleControl();
+colorScaleControl38.setLayerList(layer_list_38);
+var colorScaleControlMag = new ColorScaleControl();
+colorScaleControlMag.setLayerList(layer_list_mag);
+
 var map = new Map({
   target: "map",
   units: "m",
@@ -254,7 +257,9 @@ var map = new Map({
     scaleLine,
     attribution,
     grat,
-    colorScaleControl
+    colorScaleControl31,
+    colorScaleControl38,
+    colorScaleControlMag
   ]),
   layers: [
     new TileLayer({
