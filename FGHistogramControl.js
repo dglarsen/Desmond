@@ -148,7 +148,6 @@ var HistogramControl = /*@__PURE__*/ (function (Control) {
     });
     var barWidth = 5;
     var plotHeight = 150;
-    console.log(d3);
     var chart = d3
     .select("#plot")
     .append("svg")

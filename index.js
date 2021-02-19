@@ -33,6 +33,7 @@ import SearchFeature from "./FGSearchFeature";
 import PrintScaleControl from "./FGPrintScaleControl";
 import ColorScaleLegendControl from "./FGColorScaleLegendControl";
 import HistogramControl from "./FGHistogramControl";
+import ClickInfoControl from "./FGClickInfoControl";
 
 proj4.defs(
   "EPSG:26911",
@@ -332,25 +333,9 @@ color_scale_legend.setup();
 var layerSwitcher = new LayerSwitcher();
 map.addControl(layerSwitcher);
 
-map.on("singleclick", function (evt) {
-  document.getElementById("info").innerHTML = "";
-  var viewResolution = /** @type {number} */ (view.getResolution());
-  var url = wmsSource.getFeatureInfoUrl(
-    evt.coordinate,
-    viewResolution,
-    "EPSG:26911",
-    { INFO_FORMAT: "text/html" }
-  );
-  if (url) {
-    fetch(url)
-      .then(function (response) {
-        return response.text();
-      })
-      .then(function (html) {
-        document.getElementById("info").innerHTML = html;
-      });
-  }
-});
+var click_info_control = new ClickInfoControl();
+map.addControl(click_info_control);
+click_info_control.setup(map, wmsSource);
 
 var histogram_control = new HistogramControl(map, wmsSource);
 map.addControl(histogram_control);
