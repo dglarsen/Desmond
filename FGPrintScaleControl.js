@@ -22,8 +22,8 @@ var PrintScaleControl = /*@__PURE__*/ (function (Control) {
       var className = element.className || "";
       return (
         className.indexOf("ol-control") === -1 ||
-        className.indexOf("ol-layerswitcher") === -1 ||
         className.indexOf("ol-scale") > -1 ||
+        className.indexOf("fg-ol-color-scale") > -1 ||
         (className.indexOf("ol-attribution") > -1 &&
           className.indexOf("ol-uncollapsible"))
       );

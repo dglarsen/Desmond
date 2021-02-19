@@ -153,7 +153,7 @@ var ColorScaleControl = /*@__PURE__*/ (function (Control) {
 
     var element = document.createElement("div");
     element.id = "ColorScale";
-    element.className = "rotate-north ol-unselectable ol-control";
+    element.className = "ol-unselectable ol-control";
     element.appendChild(this.minimum);
     element.appendChild(this.maximum);
 
