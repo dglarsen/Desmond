@@ -9,7 +9,7 @@ var ColorScaleLegendControl = /*@__PURE__*/ (function (Control) {
 
     var element = document.createElement("div");
     element.id = "ColorScaleLegend";
-    element.className = "ol-unselectable ol-control";
+    element.className = "fg-ol-color-scale ol-unselectable ol-control";
     element.innerHTML = `
     Legend:
     <div><img id="legend"/></div>`
