@@ -171,34 +171,8 @@ var ColorScaleControl = /*@__PURE__*/ (function (Control) {
   ColorScaleControl.prototype.constructor = ColorScaleControl;
 
   ColorScaleControl.prototype.handleChange = function handleChange() {
-    for (let layer_index in this.layer_list_31) {
-      var source = this.layer_list_31[layer_index].getSource();
-      var params = source.getParams();
-      // TODO: this is fragile, will only work for sources with one layer
-      var sld_json = sldJSONFactory(
-        [params["LAYERS"]],
-        parseFloat(this.minimum.value),
-        parseFloat(this.maximum.value)
-      );
-      var sld_xml = marshaller.marshalString(sld_json);
-      params["SLD_BODY"] = sld_xml;
-      source.updateParams(params);
-    }
-    for (let layer_index in this.layer_list_38) {
-      var source = this.layer_list_38[layer_index].getSource();
-      var params = source.getParams();
-      // TODO: this is fragile, will only work for sources with one layer
-      var sld_json = sldJSONFactory(
-        [params["LAYERS"]],
-        parseFloat(this.minimum.value),
-        parseFloat(this.maximum.value)
-      );
-      var sld_xml = marshaller.marshalString(sld_json);
-      params["SLD_BODY"] = sld_xml;
-      source.updateParams(params);
-    }
-    for (let layer_index in this.layer_list_mag) {
-      var source = this.layer_list_mag[layer_index].getSource();
+    for (let layer_index in this.layer_list) {
+      var source = this.layer_list[layer_index].getSource();
       var params = source.getParams();
       // TODO: this is fragile, will only work for sources with one layer
       var sld_json = sldJSONFactory(
@@ -212,15 +186,9 @@ var ColorScaleControl = /*@__PURE__*/ (function (Control) {
     }
   };
 
-  ColorScaleControl.prototype.setLayerList31 = function setLayerList31(list) {
-    this.layer_list_31 = list;
+  ColorScaleControl.prototype.setLayerList = function setLayerList(list) {
+    this.layer_list = list;
     this.handleChange();
-  };
-  ColorScaleControl.prototype.setLayerList38 = function setLayerList38(list) {
-    this.layer_list_38 = list;
-  };
-  ColorScaleControl.prototype.setLayerListMag = function setLayerListMag(list) {
-    this.layer_list_mag = list;
   };
   return ColorScaleControl;
 })(Control);
