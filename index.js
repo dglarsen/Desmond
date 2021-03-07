@@ -3,6 +3,16 @@ import "ol-ext/control/LayerSwitcher.css";
 import "ol-ext/control/Search.css";
 import "ol-ext/dist/ol-ext.css";
 
+var styles = `
+      .ol-control.ol-bar .ol-option-bar .ol-control {
+        display: table-row;
+      }
+`
+var styleSheet = document.createElement("style")
+styleSheet.type = "text/css"
+styleSheet.innerText = styles
+document.head.appendChild(styleSheet)
+
 import BingMaps from "ol/source/BingMaps";
 import Map from "ol/Map";
 import View from "ol/View";
@@ -17,6 +27,9 @@ import TileWMS from "ol/source/TileWMS";
 import FullScreen from "ol/control/FullScreen";
 import Attribution from "ol/control/Attribution";
 import LayerSwitcher from "ol-ext/control/LayerSwitcher";
+import Bar from "ol-ext/control/Bar";
+import Toggle from "ol-ext/control/Toggle";
+import TextButton from "ol-ext/control/TextButton";
 import WMSCapabilities from "ol/format/WMSCapabilities";
 import proj4 from "proj4";
 import { register } from "ol/proj/proj4";
@@ -32,8 +45,8 @@ import ColorScaleControl from "./FGColorScaleControl"
 import SearchFeature from "./FGSearchFeature";
 import PrintScaleControl from "./FGPrintScaleControl";
 import ColorScaleLegendControl from "./FGColorScaleLegendControl";
-import HistogramControl from "./FGHistogramControl";
-import ClickInfoControl from "./FGClickInfoControl";
+//import HistogramControl from "./FGHistogramControl";
+//import ClickInfoControl from "./FGClickInfoControl";
 
 proj4.defs(
   "EPSG:26911",
@@ -138,7 +151,7 @@ var wmsLayer = new ImageLayer({
 var vectorSource = new VectorSource({
   format: new GeoJSON(),
   url:
-    "https://larsenwest.ca:8443/geoserver/focusedgeo_postgis/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=focusedgeo_postgis:TallCree_SiteList&maxFeatures=50&outputFormat=application/json&srsname=EPSG:26911"
+  "https://larsenwest.ca:8443/geoserver/focusedgeo_postgis/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=focusedgeo_postgis:TallCree_SiteList&maxFeatures=50&outputFormat=application/json&srsname=EPSG:26911"
 });
 
 var fill = new Fill({
@@ -161,7 +174,7 @@ function tileLayerFactory(site) {
       projection: "EPSG:900913",
       url: "https://larsenwest.ca:8443/geoserver/TallCree_2751/wms",
       attributions:
-        '© <a href="https://aksgeoscience.com" ><img src="akslogo.jpg"></a>',
+      '© <a href="https://aksgeoscience.com" ><img src="akslogo.jpg"></a>',
       crossOrigin: "",
       params: {
         LAYERS: site,
@@ -244,10 +257,16 @@ var attribution = new Attribution({
 //end of grid
 var colorScaleControl31 = new ColorScaleControl();
 colorScaleControl31.setLayerList(layer_list_31);
+//colorScaleControl31.element.style.bottom = "180px";
+//colorScaleControl31.element.style.right = "10px";
 var colorScaleControl38 = new ColorScaleControl();
 colorScaleControl38.setLayerList(layer_list_38);
+//colorScaleControl38.element.style.bottom = "210px";
+//colorScaleControl38.element.style.right = "10px";
 var colorScaleControlMag = new ColorScaleControl();
 colorScaleControlMag.setLayerList(layer_list_mag);
+//colorScaleControlMag.element.style.bottom = "240px";
+//colorScaleControlMag.element.style.right = "10px";
 
 var map = new Map({
   target: "map",
@@ -256,10 +275,7 @@ var map = new Map({
     new FullScreen(),
     scaleLine,
     attribution,
-    grat,
-    colorScaleControl31,
-    colorScaleControl38,
-    colorScaleControlMag
+    grat
   ]),
   layers: [
     new TileLayer({
@@ -268,7 +284,7 @@ var map = new Map({
       preload: Infinity,
       source: new BingMaps({
         key:
-          "82o22Jd9KBSXdi7KOw9F~-ljDB0Kkf0oF-Egpwvb9_w~Aqsa-2Is6gI2fOr88_Kgqe8RC041lQaheYQt9ISHnZ2L4jpJkBerWGqwZ2t31CRV",
+        "82o22Jd9KBSXdi7KOw9F~-ljDB0Kkf0oF-Egpwvb9_w~Aqsa-2Is6gI2fOr88_Kgqe8RC041lQaheYQt9ISHnZ2L4jpJkBerWGqwZ2t31CRV",
         imagerySet: "Aerial",
         // use maxZoom 19 to see stretched tiles instead of the BingMaps
         // "no photos at this zoom level" tiles
@@ -299,7 +315,7 @@ var map = new Map({
         url: "https://larsenwest.ca:8443/geoserver/TallCree_2751/wms",
         params: {
           LAYERS:
-            "SouthLandFill_EM31,NorthTallCree_Area2_EM31,OldLandFill_EM31,BeaverRanch_EM31,NorthTallCree_Area1_EM31",
+          "SouthLandFill_EM31,NorthTallCree_Area2_EM31,OldLandFill_EM31,BeaverRanch_EM31,NorthTallCree_Area1_EM31",
           TILED: true
         },
         serverType: "geoserver"
@@ -317,7 +333,7 @@ var map = new Map({
         url: "https://larsenwest.ca:8443/geoserver/TallCree_2751/wms",
         params: {
           LAYERS:
-            "SouthLandFill_track,NorthTallCree_Area2_track,OldLandFill_track,BeaverRanch_EM31_track,NorthTallCree_Area1_track",
+          "SouthLandFill_track,NorthTallCree_Area2_track,OldLandFill_track,BeaverRanch_EM31_track,NorthTallCree_Area1_track",
           TILED: true
         },
         serverType: "geoserver"
@@ -333,18 +349,17 @@ var map = new Map({
 var color_scale_legend = new ColorScaleLegendControl(wmsSource);
 map.addControl(color_scale_legend);
 color_scale_legend.setup();
-
 // var layerSwitcher = new ol.control.LayerSwitcher({        enableOpacitySliders: true    });
 var layerSwitcher = new LayerSwitcher();
 map.addControl(layerSwitcher);
 
-var click_info_control = new ClickInfoControl();
-map.addControl(click_info_control);
-click_info_control.setup(map, wmsSource);
+//var click_info_control = new ClickInfoControl();
+//map.addControl(click_info_control);
+//click_info_control.setup(map, wmsSource);
 
-var histogram_control = new HistogramControl(map, wmsSource);
-map.addControl(histogram_control);
-histogram_control.setup(map);
+//var histogram_control = new HistogramControl(map, wmsSource);
+//map.addControl(histogram_control);
+//histogram_control.setup(map);
 
 
 var search = new SearchFeature({
@@ -358,9 +373,9 @@ var search = new SearchFeature({
 ;
 /*
 search.getInputField().addEventListener("focus", function (e) {
-  console.log("Focused");
-  search.search();
-  search.drawList_("*");
+console.log("Focused");
+search.search();
+search.drawList_("*");
 });
 */
 // Select feature when click on the reference index
@@ -382,13 +397,34 @@ var feature_select = new FeatureSelect();
 map.addInteraction(feature_select);
 feature_select.on("select", function (e) {
   if (e.selected[0])
-    e.selected[0].setStyle(function (feature) {
-      labelStyle.getText().setText(feature.get("name"));
-      return style;
-    });
+  e.selected[0].setStyle(function (feature) {
+    labelStyle.getText().setText(feature.get("name"));
+    return style;
+  });
 
   //var style = sites_vector_layer.getStyle();
 });
 
 var print = new PrintScaleControl();
 map.addControl(print);
+
+var sub1 = new Bar(
+  {	toggleOne: true,
+    controls:
+    [
+      colorScaleControl31,
+      colorScaleControl38,
+      colorScaleControlMag
+    ]
+  });
+var mainbar = new Bar(
+  {	controls: [
+    new Toggle(
+      {	html: '0',
+      // First level nested control bar
+      bar: sub1,
+      onToggle: function() {}
+    })
+  ]
+});
+map.addControl ( mainbar );

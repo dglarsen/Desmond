@@ -1,6 +1,8 @@
 
 import Control from 'ol/control/Control'
 
+import {getUid} from 'ol/util';
+
 var Jsonix = require("jsonix").Jsonix;
 var XLink_1_0 = require("w3c-schemas").XLink_1_0;
 var GML_2_1_2 = require("ogc-schemas").GML_2_1_2;
@@ -152,8 +154,8 @@ var ColorScaleControl = /*@__PURE__*/ (function (Control) {
     this.maximum.value = 50;
 
     var element = document.createElement("div");
-    element.id = "ColorScale";
-    element.className = "ol-unselectable ol-control";
+    element.id = "ColorScale-"+getUid(this);
+    element.className = "fg-ol-colorscale ol-unselectable ol-control";
     element.appendChild(this.minimum);
     element.appendChild(this.maximum);
 
