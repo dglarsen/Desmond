@@ -7,6 +7,17 @@ var styles = `
       .ol-control.ol-bar .ol-option-bar .ol-control {
         display: table-row;
       }
+      .ol-control.ol-bar .ol-control.ol-option-bar {
+        top: -140px;
+        left: -500px;
+      }
+      .ol-control.ol-bar {
+        top: auto;
+        left: auto;
+        right: 5px;
+        bottom: 45px;
+      }
+}
 `
 var styleSheet = document.createElement("style")
 styleSheet.type = "text/css"
@@ -406,7 +417,6 @@ feature_select.on("select", function (e) {
 });
 
 var print = new PrintScaleControl();
-map.addControl(print);
 
 var sub1 = new Bar(
   {	toggleOne: true,
@@ -414,7 +424,8 @@ var sub1 = new Bar(
     [
       colorScaleControl31,
       colorScaleControl38,
-      colorScaleControlMag
+      colorScaleControlMag,
+      print
     ]
   });
 var mainbar = new Bar(
