@@ -80,6 +80,7 @@ var grat = new Graticule({
   stepCoord: 2,
   projection: "EPSG:26911"
 });
+
 var labelStyle = new Style({
   text: new Text({
     font: "12px Calibri,sans-serif",
@@ -267,14 +268,17 @@ var attribution = new Attribution({
 
 //end of grid
 var colorScaleControl31 = new ColorScaleControl();
+colorScaleControl31.setName("<u>EM31:</u> ");
 colorScaleControl31.setLayerList(layer_list_31);
 //colorScaleControl31.element.style.bottom = "180px";
 //colorScaleControl31.element.style.right = "10px";
 var colorScaleControl38 = new ColorScaleControl();
+colorScaleControl38.setName("<u>EM38:</u> ");
 colorScaleControl38.setLayerList(layer_list_38);
 //colorScaleControl38.element.style.bottom = "210px";
 //colorScaleControl38.element.style.right = "10px";
 var colorScaleControlMag = new ColorScaleControl();
+colorScaleControlMag.setName("<u>MAG:</u> ");
 colorScaleControlMag.setLayerList(layer_list_mag);
 //colorScaleControlMag.element.style.bottom = "240px";
 //colorScaleControlMag.element.style.right = "10px";
@@ -415,6 +419,38 @@ feature_select.on("select", function (e) {
 
   //var style = sites_vector_layer.getStyle();
 });
+/*
+
+  var style = grat.getStyle();
+  style.setStroke(new Stroke({color:"#000", width:1}));
+  style.setFill(new Fill({color: "#fff"}));
+  */
+  /*document.getElementById("line").onchange=setGraticule;
+  var g = grat;
+  function setGraticule ()
+  {	if (g) map.removeControl(g);
+    g = grat[$("#grat").val()];
+    var c = $("#color").val();
+    var style = new ol.style.Style();
+    if ($("#line").prop('checked')) style.setStroke (new ol.style.Stroke({ color:c, width:1 }));
+    if ($("#border").prop('checked')) style.setFill (new ol.style.Fill({ color: $("#line").prop('checked') ? "#fff" : "#000" }));
+    if ($("#coords").prop('checked')) style.setText (new ol.style.Text(
+      {	stroke: new ol.style.Stroke({ color:"#fff", width:2 }),
+      fill: new ol.style.Fill({ color:c }),
+    }));
+    g.setStyle(style);
+    map.addControl(g);
+  }
+}
+setGraticule();*/
+
+/*function toggleGraticuleLines() {
+  var style = grat.getStyle();
+  grat.setStyle(new Style({
+    fill: new Fill({color: "#fff"})
+  }));
+};
+toggleGraticuleLines();*/
 
 var print = new PrintScaleControl();
 
@@ -431,7 +467,7 @@ var sub1 = new Bar(
 var mainbar = new Bar(
   {	controls: [
     new Toggle(
-      {	html: '0',
+      {	html: 'Tools',
       // First level nested control bar
       bar: sub1,
       onToggle: function() {}

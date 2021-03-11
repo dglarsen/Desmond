@@ -47,7 +47,7 @@ var ColorScaleLegendControl = /*@__PURE__*/ (function (Control) {
       this.updateLegend(resolution);
     }.bind(this));
 
-  }
+  };
 
   return ColorScaleLegendControl;
 })(Control);

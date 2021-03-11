@@ -144,19 +144,29 @@ var ColorScaleControl = /*@__PURE__*/ (function (Control) {
   function ColorScaleControl(opt_options) {
     var options = opt_options || {};
 
-    this.minimum = document.createElement("input");
-    this.maximum = document.createElement("input");
-
-    this.minimum.type = "number";
-    this.minimum.value = 0;
-
-    this.maximum.type = "number";
-    this.maximum.value = 50;
-
     var element = document.createElement("div");
     element.id = "ColorScale-"+getUid(this);
     element.className = "fg-ol-colorscale ol-unselectable ol-control";
+
+    this.title = document.createElement("label");
+    this.title.innerHTML = "TITLE:";
+    element.appendChild(this.title);
+
+    var label = document.createElement("label");
+    label.innerHTML = "Min:";
+    this.minimum = document.createElement("input");
+    this.minimum.type = "number";
+    this.minimum.value = 0;
+    element.appendChild(label);
     element.appendChild(this.minimum);
+
+
+    label = document.createElement("label");
+    label.innerHTML = "Max:";
+    this.maximum = document.createElement("input");
+    this.maximum.type = "number";
+    this.maximum.value = 50;
+    element.appendChild(label);
     element.appendChild(this.maximum);
 
     Control.call(this, {
@@ -188,10 +198,15 @@ var ColorScaleControl = /*@__PURE__*/ (function (Control) {
     }
   };
 
+  ColorScaleControl.prototype.setName = function setName(name) {
+    this.title.innerHTML = name;
+  };
+
   ColorScaleControl.prototype.setLayerList = function setLayerList(list) {
     this.layer_list = list;
     this.handleChange();
   };
+
   return ColorScaleControl;
 })(Control);
 
