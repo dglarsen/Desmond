@@ -8,8 +8,8 @@ var styles = `
         display: table-row;
       }
       .ol-control.ol-bar .ol-control.ol-option-bar {
-        top: -140px;
-        left: -500px;
+        top: -200px;
+        left: -600px;
       }
       .ol-control.ol-bar {
         top: auto;
@@ -75,6 +75,7 @@ for (var z = 0; z < 19; ++z) {
   resolutions[z] = size / Math.pow(2, z);
   matrixIds[z] = z;
 }
+
 var grat = new Graticule({
   step: 20,
   stepCoord: 2,
@@ -283,14 +284,63 @@ colorScaleControlMag.setLayerList(layer_list_mag);
 //colorScaleControlMag.element.style.bottom = "240px";
 //colorScaleControlMag.element.style.right = "10px";
 
+
+function toggleGraticuleLines(on) {
+  var style;
+  if(on) {
+    style = new Style({
+      text: new Text({
+        font: "12px Calibri,sans-serif",
+        rotation: 0,
+        textAlign: "left",
+        overflow: true,
+        fill: new Fill({
+          color: "#000"
+        }),
+        stroke: new Stroke({
+          color: "#fff",
+          width: 3
+        })
+      }),
+      stroke: new Stroke({
+        color: "#000",
+        width: 1
+      }),
+      fill: new Fill({
+        color: "#fff"
+      })
+    });
+  } else {
+    style = new Style({
+      text: new Text({
+        font: "12px Calibri,sans-serif",
+        rotation: 0,
+        textAlign: "left",
+        overflow: true,
+        fill: new Fill({
+          color: "#000"
+        }),
+        stroke: new Stroke({
+          color: "#fff",
+          width: 3
+        })
+      }),
+      fill: new Fill({
+        color: "#000"
+      })
+    });
+  }
+  grat.setStyle(style);
+  map.render();
+};
+
 var map = new Map({
   target: "map",
   units: "m",
   controls: defaultControls().extend([
     new FullScreen(),
     scaleLine,
-    attribution,
-    grat
+    attribution
   ]),
   layers: [
     new TileLayer({
@@ -361,6 +411,8 @@ var map = new Map({
   view: view
 });
 
+map.addControl(grat);
+
 var color_scale_legend = new ColorScaleLegendControl(wmsSource);
 map.addControl(color_scale_legend);
 color_scale_legend.setup();
@@ -385,14 +437,7 @@ var search = new SearchFeature({
   placeholder: "Site Name",
   maxItems: 1000
 });
-;
-/*
-search.getInputField().addEventListener("focus", function (e) {
-console.log("Focused");
-search.search();
-search.drawList_("*");
-});
-*/
+
 // Select feature when click on the reference index
 search.on("select", function (e) {
   // select.getFeatures().clear();
@@ -419,38 +464,6 @@ feature_select.on("select", function (e) {
 
   //var style = sites_vector_layer.getStyle();
 });
-/*
-
-  var style = grat.getStyle();
-  style.setStroke(new Stroke({color:"#000", width:1}));
-  style.setFill(new Fill({color: "#fff"}));
-  */
-  /*document.getElementById("line").onchange=setGraticule;
-  var g = grat;
-  function setGraticule ()
-  {	if (g) map.removeControl(g);
-    g = grat[$("#grat").val()];
-    var c = $("#color").val();
-    var style = new ol.style.Style();
-    if ($("#line").prop('checked')) style.setStroke (new ol.style.Stroke({ color:c, width:1 }));
-    if ($("#border").prop('checked')) style.setFill (new ol.style.Fill({ color: $("#line").prop('checked') ? "#fff" : "#000" }));
-    if ($("#coords").prop('checked')) style.setText (new ol.style.Text(
-      {	stroke: new ol.style.Stroke({ color:"#fff", width:2 }),
-      fill: new ol.style.Fill({ color:c }),
-    }));
-    g.setStyle(style);
-    map.addControl(g);
-  }
-}
-setGraticule();*/
-
-/*function toggleGraticuleLines() {
-  var style = grat.getStyle();
-  grat.setStyle(new Style({
-    fill: new Fill({color: "#fff"})
-  }));
-};
-toggleGraticuleLines();*/
 
 var print = new PrintScaleControl();
 
@@ -461,9 +474,17 @@ var sub1 = new Bar(
       colorScaleControl31,
       colorScaleControl38,
       colorScaleControlMag,
-      print
+      print,
+      new Toggle({
+        html: 'Grid',
+        active:true,
+        onToggle: function() {
+        toggleGraticuleLines(this.getActive());
+        }
+      })
     ]
   });
+
 var mainbar = new Bar(
   {	controls: [
     new Toggle(
